@@ -390,7 +390,7 @@ void eval_root(node_t *nptr) {
         eval_node(nptr->children[i]);
     }
     if (terminate || ignore_input) return;
-    
+    nptr->type = nptr->children[0]->type;
     if (nptr->type == STRING_TYPE) {
         (nptr->val).sval = (char *) malloc(strlen(nptr->children[0]->val.sval) + 1);
         if (! nptr->val.sval) {
