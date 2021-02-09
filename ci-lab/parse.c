@@ -72,22 +72,33 @@ static node_t *build_leaf(void) {
     lfnode-> node_type = NT_LEAF;
     lfnode-> tok = this_token-> ttype;
     if(this_token-> ttype == TOK_TRUE){
-        lfnode-> val.bval = this_token-> repr;
+        lfnode-> val.bval = true;
         lfnode-> type = BOOL_TYPE;
     }
-    if(this_token -> ttype == TOK_FALSE){
-        lfnode-> val.bval = this_token-> repr;
+    else if(this_token -> ttype == TOK_FALSE){
+        lfnode-> val.bval = false;
         lfnode-> type = BOOL_TYPE;
     }
-    if(this_token-> ttype == TOK_STR){
-        lfnode-> val.sval = this_token-> repr;
+    else if(this_token-> ttype == TOK_STR){
+        char *str = malloc(sizeof(char) * (strlen(this_token->repr) + 1));
+        strcpy(str, this_token->repr);
         lfnode-> type = STRING_TYPE;
+        lfnode-> val.sval = str;    
     }
-    if(this_token-> ttype == TOK_NUM){
+    else if(this_token-> ttype == TOK_NUM){
         lfnode-> val.ival = atoi(this_token-> repr);
         lfnode-> type = INT_TYPE;
     }
-    lfnode-> children[3] = NULL;
+    else if(this_token->ttype == TOK_SEP||this_token->ttype == TOK_FMT_SPEC) {
+        lfnode->type = FMT_TYPE;
+        lfnode->val.fval = this_token-> repr[0];
+    }
+    else if(this_token->ttype == TOK_ID){
+        lfnode-> type = ID_TYPE;
+    }
+    else {
+        lfnode->type = NO_TYPE;
+    }
 
     return lfnode; 
 }
@@ -118,18 +129,52 @@ static node_t *build_exp(void) {
         if(this_token-> ttype == TOK_LPAREN) {
             node_t *inode = calloc(1, sizeof(node_t));
             advance_lexer();
-            inode-> children[0] = build_exp();
-            advance_lexer();   
-            inode-> tok = this_token-> ttype;
-            inode-> node_type = NT_INTERNAL;  
-            inode-> type = NO_TYPE;   
-            advance_lexer();
-            inode->children[1] = build_exp();
-            if(next_token-> ttype != TOK_EOL)
+            if(this_token->ttype == TOK_UMINUS || this_token->ttype == TOK_NOT) {
+                inode-> tok = this_token-> ttype;
+                inode-> node_type = NT_INTERNAL;  
+                inode-> type = NO_TYPE; 
+                advance_lexer(); 
+                inode-> children[0] = build_exp();
+                if(next_token-> ttype != TOK_EOL)
+                    advance_lexer();
+                return inode;
+            }
+            else if(next_token->ttype == TOK_QUESTION) {
+                inode-> children[0] = build_exp();
                 advance_lexer();
-            return inode;
+                inode-> tok = this_token-> ttype;
+                inode-> node_type = NT_INTERNAL;  
+                inode-> type = NO_TYPE; 
+                advance_lexer();
+                inode-> children[1] = build_exp();
+                advance_lexer();
+                if(this_token->ttype != TOK_COLON) {
+                    handle_error(ERR_SYNTAX);
+                    return NULL;
+                }
+                advance_lexer();
+                inode-> children[2] = build_exp();
+                if(next_token-> ttype != TOK_EOL)
+                    advance_lexer();
+                return inode; 
+            }
+            else {
+                inode-> children[0] = build_exp();
+                advance_lexer();
+                inode-> tok = this_token-> ttype;
+                inode-> node_type = NT_INTERNAL;  
+                inode-> type = NO_TYPE;
+                advance_lexer();
+                inode-> children[1] = build_exp();
+                if(next_token-> ttype != TOK_EOL)
+                    advance_lexer();
+                return inode;
+            }
         }
     }
+    handle_error(ERR_SYNTAX);
+    node_t *inode = calloc(1, sizeof(node_t));
+    return inode;
 } 
         
         
@@ -235,7 +280,13 @@ node_t *read_and_parse(void) {
  * Return value: none
  * (STUDENT TODO) */
 void cleanup(node_t *nptr) {
+    if(nptr == NULL)
+        return;
+    for(int i = 0; i < 3; i++) {
+        if((*nptr).children[i] == NULL)
+            break;
+        cleanup((*nptr).children[i]);
+    }
     // Is it enough to free the node the function called upon?
     free(nptr);
-    return;
 }
