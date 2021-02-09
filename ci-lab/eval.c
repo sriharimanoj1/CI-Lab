@@ -144,7 +144,7 @@ static void eval_node(node_t *nptr) {
         eval_node(nptr->children[0]);
         eval_node(nptr->children[1]);
         if(nptr-> children[1]->val.ival == 0){
-            handle_error(ERR_EVAL);
+            handle_error(ERR_TYPE);
             return;
         }
         if(nptr-> children[0]-> type == INT_TYPE && nptr-> children[1]->type  == INT_TYPE) {
@@ -286,7 +286,7 @@ static void eval_node(node_t *nptr) {
         if(nptr-> children[0]-> type == STRING_TYPE && nptr-> children[1]->type  == STRING_TYPE){
             node_t *childone = nptr->children[0];
             node_t *childtwo = nptr->children[1];
-            bool gt = strcmp(childone-> val.sval, childtwo-> val.sval) < 0;
+            bool gt = strcmp(childone-> val.sval, childtwo-> val.sval) > 0;
             if(gt)
                 nptr-> tok = TOK_TRUE;
             else
