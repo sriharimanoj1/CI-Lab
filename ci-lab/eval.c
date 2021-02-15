@@ -31,7 +31,15 @@ static void infer_type(node_t *nptr) {
             break;
         infer_type((*nptr).children[i]);
     }
-    nptr-> type = (*nptr).children[0]-> type;
+    if(nptr->tok == TOK_EQ || nptr->tok == TOK_LT || nptr->tok == TOK_GT) {
+        nptr->type = BOOL_TYPE;
+    }
+    else if(nptr->tok == TOK_DIV){
+        nptr->type = INT_TYPE;
+    }
+    else {
+        nptr-> type = (*nptr).children[0]-> type;
+    }
 }
 
 /* infer_root() - set the type of the root node based on the types of children
@@ -156,7 +164,10 @@ static void eval_node(node_t *nptr) {
             nptr-> val.ival = quotient;
             return;
         }
-        handle_error(ERR_TYPE);
+        else{
+                    handle_error(ERR_TYPE);
+                    return;
+        }
     }
     if(nptr-> tok == TOK_MOD) {
         eval_node(nptr->children[0]);
@@ -390,7 +401,11 @@ void eval_root(node_t *nptr) {
         eval_node(nptr->children[i]);
     }
     if (terminate || ignore_input) return;
-    nptr->type = nptr->children[0]->type;
+    //if(nptr->children[0]->type == STRING_TYPE && (!(strcmp(nptr->children[0]->val.sval, "cba") == 0 ||strcmp(nptr->children[0]->val.sval, "a") == 0 || nptr->children[0]->type == STRING_TYPE)))
+        //nptr->type = nptr->children[0]->type;
+    
+    //if(nptr->children[0]->tok==TOK_EQ||nptr->tok==TOK_EQ)
+    //    nptr->type = nptr->children[0]->type;
     if (nptr->type == STRING_TYPE) {
         (nptr->val).sval = (char *) malloc(strlen(nptr->children[0]->val.sval) + 1);
         if (! nptr->val.sval) {

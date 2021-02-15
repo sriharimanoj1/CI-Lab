@@ -79,6 +79,10 @@ static node_t *build_leaf(void) {
         lfnode-> val.bval = false;
         lfnode-> type = BOOL_TYPE;
     }
+    /*else if(strcmp(this_token-> repr, "abc" == 0){
+        lfnode-> type = STRING_TYPE;
+        lfnode-> val.sval = "abc";
+    }*/
     else if(this_token-> ttype == TOK_STR){
         char *str = malloc(sizeof(char) * (strlen(this_token->repr) + 1));
         strcpy(str, this_token->repr);
