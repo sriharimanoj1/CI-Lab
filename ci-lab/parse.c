@@ -163,13 +163,19 @@ static node_t *build_exp(void) {
                 return inode; 
             }
             else {
-                inode-> children[0] = build_exp();
-                advance_lexer();
-                inode-> tok = this_token-> ttype;
-                inode-> node_type = NT_INTERNAL;  
-                inode-> type = NO_TYPE;
-                advance_lexer();
-                inode-> children[1] = build_exp();
+                if(next_token->ttype == TOK_RPAREN) {
+                    inode = build_exp();
+
+                } 
+                else {
+                    inode-> children[0] = build_exp();
+                    advance_lexer();
+                    inode-> tok = this_token-> ttype;
+                    inode-> node_type = NT_INTERNAL;  
+                    inode-> type = NO_TYPE;
+                    advance_lexer();
+                    inode-> children[1] = build_exp();
+                }
                 if(next_token-> ttype != TOK_EOL)
                     advance_lexer();
                 return inode;
