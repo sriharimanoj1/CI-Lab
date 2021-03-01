@@ -323,7 +323,9 @@ static void eval_node(node_t *nptr) {
         }
         else if(nptr->children[0]->type == STRING_TYPE) {
             nptr->tok = TOK_NUM;
-            nptr->type = INT_TYPE;
+            nptr->type = STRING_TYPE;
+            //char *str = malloc(sizeof(children[0]->val.sval));
+            //strcopy(str, children[0]->val.sval);
             char *reversed = strrev(nptr->children[0]->val.sval);
             nptr->val.sval = reversed;
             return;
@@ -405,11 +407,6 @@ void eval_root(node_t *nptr) {
         eval_node(nptr->children[i]);
     }
     if (terminate || ignore_input) return;
-    //if(nptr->children[0]->type == STRING_TYPE && (!(strcmp(nptr->children[0]->val.sval, "cba") == 0 ||strcmp(nptr->children[0]->val.sval, "a") == 0 || nptr->children[0]->type == STRING_TYPE)))
-        //nptr->type = nptr->children[0]->type;
-    
-    //if(nptr->children[0]->tok==TOK_EQ||nptr->tok==TOK_EQ)
-    //    nptr->type = nptr->children[0]->type;
     if (nptr->type == STRING_TYPE) {
         (nptr->val).sval = (char *) malloc(strlen(nptr->children[0]->val.sval) + 1);
         if (! nptr->val.sval) {
