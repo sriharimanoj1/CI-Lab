@@ -83,6 +83,10 @@ static void eval_node(node_t *nptr) {
     if (terminate || ignore_input) return;
     if(nptr-> tok == TOK_PLUS) {
         eval_node(nptr->children[0]);
+        if(nptr-> children[0]-> type == BOOL_TYPE) {
+            handle_error(ERR_TYPE);
+            return;
+        }
         eval_node(nptr->children[1]);
         if(nptr-> children[0]-> type == INT_TYPE && nptr-> children[1]->type  == INT_TYPE){
             node_t *childone = nptr->children[0];
