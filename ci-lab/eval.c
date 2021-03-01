@@ -365,6 +365,10 @@ static void eval_node(node_t *nptr) {
     if(nptr->tok == TOK_ID) {
         entry_t *var = calloc(1, sizeof(entry_t));
         var = get(nptr->val.sval);
+        if(var == NULL) {
+            handle_error(ERR_UNDEFINED);
+            return;
+        }
         nptr->type = var->type;
         nptr->val = var->val;
         if(nptr-> type == STRING_TYPE) {
