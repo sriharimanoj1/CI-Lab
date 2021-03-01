@@ -180,11 +180,11 @@ static void eval_node(node_t *nptr) {
     if(nptr-> tok == TOK_MOD) {
         eval_node(nptr->children[0]);
         eval_node(nptr->children[1]);
-        if(nptr-> children[1]->val.ival == 0){
+        if(nptr-> children[0]-> type == INT_TYPE && nptr-> children[1]->type  == INT_TYPE){
+            if(nptr-> children[1]->val.ival == 0){
             handle_error(ERR_EVAL);
             return;
         }
-        if(nptr-> children[0]-> type == INT_TYPE && nptr-> children[1]->type  == INT_TYPE){
             node_t *childone = nptr->children[0];
             node_t *childtwo = nptr->children[1];
             int mod = childone-> val.ival % childtwo-> val.ival;
