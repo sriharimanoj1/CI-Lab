@@ -338,8 +338,10 @@ static void eval_node(node_t *nptr) {
         else if(nptr->children[0]->type == STRING_TYPE) {
             nptr->tok = TOK_NUM;
             nptr->type = STRING_TYPE;
-            char *reversed = strrev(nptr->children[0]->val.sval);
-            nptr->val.sval = reversed;
+            char *rev = malloc(sizeof(nptr->children[0]->val.sval));
+            strcpy(rev, nptr->children[0]->val.sval);
+            //char *reversed = strrev(nptr->children[0]->val.sval);
+            nptr->val.sval = strrev(rev);
             return;
         }
         handle_error(ERR_TYPE);
