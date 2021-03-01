@@ -110,7 +110,9 @@ static void eval_node(node_t *nptr) {
         if(nptr-> children[0]-> type == STRING_TYPE && nptr-> children[1]->type  == STRING_TYPE){
             node_t *childone = nptr->children[0];
             node_t *childtwo = nptr->children[1];
-            char *sum = strcat(childone-> val.sval, childtwo-> val.sval);
+            char *str = malloc(sizeof(childone->val.sval));
+            strcpy(str, childone->val.sval);
+            char *sum = strcat(str, childtwo-> val.sval);
             nptr-> tok = TOK_STR;
             nptr-> type = STRING_TYPE;
             nptr-> val.sval = sum;
