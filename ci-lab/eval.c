@@ -24,7 +24,17 @@ char *strrev(char *str);
  */
 
 static void infer_type(node_t *nptr) {
-    if (nptr == NULL || nptr-> node_type == NT_LEAF) 
+    if (nptr == NULL) 
+        return;
+    if(nptr->node_type==NT_LEAF&&nptr->type==ID_TYPE){
+        entry_t *var = calloc(1, sizeof(entry_t));
+        var = get(nptr->val.sval);
+        if(var == NULL)
+            return;
+        nptr->type = var->type;
+        return;
+    }
+    if(nptr->node_type==NT_LEAF)
         return;
     for(int i = 0; i < 3; i++) {
         if((*nptr).children[i] == NULL)
@@ -347,6 +357,26 @@ static void eval_node(node_t *nptr) {
             return;
         }
         handle_error(ERR_TYPE);
+    }
+    if(nptr->tok == TOK_ID) {
+        entry_t *var = calloc(1, sizeof(entry_t));
+        var = get(nptr->val.sval);
+        nptr->type = var->type;
+        nptr->val = var->val;
+        if(nptr-> type == STRING_TYPE) {
+            nptr->tok = TOK_STR;
+        }
+        else if(nptr-> type == INT_TYPE) {
+            nptr->tok = TOK_NUM; 
+        }
+        else {
+            if(nptr-> val.bval == true) {
+                nptr->tok = TOK_TRUE;
+            }
+            if(nptr-> val.bval == false) {
+                nptr->tok = TOK_FALSE;
+            }
+        }
     }
     if(nptr->tok == TOK_QUESTION) {
         eval_node(nptr->children[0]);

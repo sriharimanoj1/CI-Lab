@@ -112,6 +112,34 @@ entry_t * init_entry(char *id, node_t *nptr) {
  */
 
 void put(char *id, node_t *nptr) {
+    entry_t *ins = init_entry(id, nptr);
+    long i = hash_function(id);
+    if(var_table->entries[i]==NULL){
+        var_table->entries[i] = ins;
+        return;
+    }
+    else{
+        entry_t *temp = var_table->entries[i];
+        if(strcmp(temp->id,id)==0){
+            if(temp->next!=NULL){
+            entry_t *aft = temp->next;
+            ins->next = aft;
+            }
+            var_table->entries[i] = ins;
+            return;
+        }
+        while (temp->next)
+        {
+        if(strcmp(temp->next->id,id)==0)
+            break;
+        temp = temp->next;
+        }
+        if(temp->next!=NULL && temp->next->next!=NULL){
+            entry_t *aft = temp->next->next;
+            ins->next = aft;
+        }
+        temp->next = ins;
+    }
     return;
 }
 
@@ -121,7 +149,24 @@ void put(char *id, node_t *nptr) {
  * (STUDENT TODO) 
  */
 entry_t* get(char* id) {
-    return NULL;
+    if (! var_table) {
+        logging(LOG_ERROR, "variable table doesn't exist");
+        return NULL;
+    }
+    long i = hash_function(id);
+    if(var_table->entries[i]==NULL){
+        return NULL;
+    }
+    else{
+        entry_t *temp = var_table->entries[i];
+        while (strcmp(temp->id,id)!=0)
+        {
+            if(temp->next==NULL)
+            return NULL;
+            temp = temp->next;
+        }
+        return temp;
+    }
 }
 
 void print_entry(entry_t *eptr) {
