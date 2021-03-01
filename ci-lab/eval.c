@@ -305,7 +305,7 @@ static void eval_node(node_t *nptr) {
         if(nptr-> children[0]-> type == INT_TYPE && nptr-> children[1]->type  == INT_TYPE){
             node_t *childone = nptr->children[0];
             node_t *childtwo = nptr->children[1];
-            bool gt = childone-> val.bval > childtwo-> val.bval;
+            bool gt = childone-> val.ival > childtwo-> val.ival;
             if(gt)
                 nptr-> tok = TOK_TRUE;
             else
