@@ -26,7 +26,7 @@ if [ ! -f _output2 ]; then
     exit 1
 fi
 
-DIFFS=$(grep -n -v -f _output1 _output2 | cut -d ":" -f 1)
+DIFFS=$(grep -nvxf _output1 _output2 | cut -d ":" -f 1)
 if [ "$DIFFS" ] 
 then
     echo "failed testcases:"

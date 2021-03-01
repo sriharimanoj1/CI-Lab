@@ -99,6 +99,8 @@ static node_t *build_leaf(void) {
     }
     else if(this_token->ttype == TOK_ID){
         lfnode-> type = ID_TYPE;
+        lfnode-> val.sval = malloc(sizeof(char) * (strlen(this_token->repr) + 1));
+        strcpy(lfnode->val.sval,this_token->repr);  
     }
     else {
         lfnode->type = NO_TYPE;
@@ -160,6 +162,8 @@ static node_t *build_exp(void) {
                 inode-> children[2] = build_exp();
                 if(next_token-> ttype != TOK_EOL)
                     advance_lexer();
+                if(this_token->ttype!=TOK_RPAREN)
+                    handle_error(ERR_SYNTAX);
                 return inode; 
             }
             else {
@@ -170,11 +174,37 @@ static node_t *build_exp(void) {
                 else {
                     inode-> children[0] = build_exp();
                     advance_lexer();
-                    inode-> tok = this_token-> ttype;
-                    inode-> node_type = NT_INTERNAL;  
-                    inode-> type = NO_TYPE;
+                    if(this_token->ttype==TOK_QUESTION)
+                    {
+                        inode->tok = this_token->ttype;
+                        inode->node_type=NT_INTERNAL;
+                        inode->type=NO_TYPE;
+                        advance_lexer();
+                        inode->children[1]=build_exp();
+                        advance_lexer();
+                        if(this_token->ttype!=TOK_COLON)
+                        {
+                            handle_error(ERR_SYNTAX);
+                            return NULL;
+                        }
+                        advance_lexer();
+                        inode->children[2]=build_exp();
+                        if(next_token->ttype!=TOK_EOL)
+                            advance_lexer();
+                        if(this_token->ttype!=TOK_RPAREN)
+                            handle_error(ERR_SYNTAX);
+                        return inode;
+                    }
+                    if(this_token->ttype==TOK_ID)
+                    {
+                        handle_error(ERR_SYNTAX);
+                        return inode;
+                    }
+                    inode->tok = this_token->ttype;
+                    inode->node_type=NT_INTERNAL;
+                    inode->type=NO_TYPE;
                     advance_lexer();
-                    inode-> children[1] = build_exp();
+                    inode->children[1]=build_exp();
                 }
                 if(next_token-> ttype != TOK_EOL)
                     advance_lexer();
